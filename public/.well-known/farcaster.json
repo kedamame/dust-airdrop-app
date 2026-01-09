@@ -1,0 +1,25 @@
+{
+  "accountAssociation": {
+    "header": "eyJmaWQiOjEyMzQ1NiwidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweDEyMzQ1Njc4OTBhYmNkZWYifQ",
+    "payload": "eyJkb21haW4iOiJ5b3VyLWRvbWFpbi5jb20ifQ",
+    "signature": "PLACEHOLDER_SIGNATURE"
+  },
+  "frame": {
+    "version": "1",
+    "name": "🗑️ ゴミNFT投げつけマシーン",
+    "iconUrl": "/icon.png",
+    "homeUrl": "/",
+    "imageUrl": "/og-image.png",
+    "buttonTitle": "🗑️ ゴミを投げる",
+    "splashImageUrl": "/splash.png",
+    "splashBackgroundColor": "#0f0f0f",
+    "webhookUrl": "/api/webhook"
+  }
+}
+
+
+
+
+
+
+

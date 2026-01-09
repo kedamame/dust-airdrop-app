@@ -1,0 +1,27 @@
+# Base Sepoliaテストネットへのデプロイスクリプト（Hardhat版）
+
+Write-Host "🚀 Base SepoliaにTrashNFTコントラクトをデプロイします..." -ForegroundColor Cyan
+
+# 環境変数の確認
+if (-not $env:PRIVATE_KEY) {
+    Write-Host "❌ エラー: PRIVATE_KEY環境変数が設定されていません" -ForegroundColor Red
+    Write-Host "   `$env:PRIVATE_KEY = 'your_private_key_here'" -ForegroundColor Yellow
+    exit 1
+}
+
+# Hardhatの確認
+if (-not (Get-Command npx -ErrorAction SilentlyContinue)) {
+    Write-Host "❌ エラー: npxが利用できません" -ForegroundColor Red
+    exit 1
+}
+
+# デプロイ
+Write-Host "📦 コントラクトをデプロイ中..." -ForegroundColor Yellow
+npx hardhat run scripts/deploy-hardhat.js --network baseSepolia
+
+Write-Host ""
+Write-Host "✅ デプロイ完了！" -ForegroundColor Green
+Write-Host "📝 コントラクトアドレスを.env.localのNEXT_PUBLIC_TRASH_NFT_ADDRESSに設定してください" -ForegroundColor Cyan
+
+
+
