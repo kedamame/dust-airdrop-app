@@ -38,7 +38,16 @@ const nextConfig = {
     config.plugins.push(
       new webpack.IgnorePlugin({
         resourceRegExp: /^@farcaster\/frame-sdk$/,
+        contextRegExp: /./, // すべてのコンテキストで無視
       })
+    );
+    
+    // NormalModuleReplacementPluginを使用して空のモジュールに置き換え
+    config.plugins.push(
+      new webpack.NormalModuleReplacementPlugin(
+        /^@farcaster\/frame-sdk$/,
+        require.resolve('./lib/farcaster-stub.js')
+      )
     );
     
     return config;

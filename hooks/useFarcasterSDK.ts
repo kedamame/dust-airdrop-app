@@ -31,10 +31,12 @@ async function loadSDK(): Promise<FarcasterSDK | null> {
     return null;
   }
 
+  // 動的インポートを文字列として使用（ビルド時に解決されないようにする）
   try {
-    // 動的インポートを使用（パッケージがない場合はエラーをキャッチ）
+    // 文字列を変数に格納してから動的インポート（ビルド時に解決されないようにする）
+    const sdkPath = '@farcaster/frame-sdk';
     // @ts-ignore - パッケージが存在しない可能性があるため
-    const sdkModule = await import('@farcaster/frame-sdk');
+    const sdkModule = await import(/* webpackIgnore: true */ sdkPath);
     return sdkModule.default || sdkModule;
   } catch {
     // パッケージがインストールされていない場合はnullを返す
