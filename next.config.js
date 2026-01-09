@@ -22,18 +22,24 @@ const nextConfig = {
   },
   webpack: (config, { isServer }) => {
     // @farcaster/frame-sdkが存在しない場合でもエラーを発生させない
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@farcaster/frame-sdk': false,
+    };
+    
+    // オプショナルなパッケージを外部として扱う
     config.resolve.fallback = {
       ...config.resolve.fallback,
       '@farcaster/frame-sdk': false,
     };
     
-    // オプショナルなパッケージを外部として扱う
-    if (!isServer) {
-      config.externals = config.externals || [];
-      config.externals.push({
-        '@farcaster/frame-sdk': 'commonjs @farcaster/frame-sdk',
-      });
-    }
+    // IgnorePluginを使用して@farcaster/frame-sdkを無視
+    const webpack = require('webpack');
+    config.plugins.push(
+      new webpack.IgnorePlugin({
+        resourceRegExp: /^@farcaster\/frame-sdk$/,
+      })
+    );
     
     return config;
   },

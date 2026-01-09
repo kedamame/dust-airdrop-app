@@ -24,10 +24,16 @@ type FarcasterSDK = {
   };
 };
 
-// SDKを動的にインポートする関数
+// SDKを動的にインポートする関数（ビルド時には実行されない）
 async function loadSDK(): Promise<FarcasterSDK | null> {
+  // クライアントサイドでのみ実行
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
   try {
     // 動的インポートを使用（パッケージがない場合はエラーをキャッチ）
+    // @ts-ignore - パッケージが存在しない可能性があるため
     const sdkModule = await import('@farcaster/frame-sdk');
     return sdkModule.default || sdkModule;
   } catch {
