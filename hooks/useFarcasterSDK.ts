@@ -1,7 +1,40 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import sdk from '@farcaster/frame-sdk';
+
+// @farcaster/frame-sdkの型定義（オプショナル）
+type FarcasterSDK = {
+  context: Promise<{
+    user?: {
+      fid: number;
+      username?: string;
+      displayName?: string;
+      pfpUrl?: string;
+      custody?: string;
+    };
+    client?: {
+      clientFid: number;
+      added: boolean;
+    };
+  }>;
+  actions: {
+    ready: () => Promise<void>;
+    openUrl: (url: string) => Promise<void>;
+    close: () => Promise<void>;
+  };
+};
+
+// SDKを動的にインポートする関数
+async function loadSDK(): Promise<FarcasterSDK | null> {
+  try {
+    // 動的インポートを使用（パッケージがない場合はエラーをキャッチ）
+    const sdkModule = await import('@farcaster/frame-sdk');
+    return sdkModule.default || sdkModule;
+  } catch {
+    // パッケージがインストールされていない場合はnullを返す
+    return null;
+  }
+}
 
 type FarcasterContext = {
   user?: {
@@ -21,12 +54,24 @@ export function useFarcasterSDK() {
   const [isReady, setIsReady] = useState(false);
   const [context, setContext] = useState<FarcasterContext | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [sdk, setSdk] = useState<FarcasterSDK | null>(null);
 
   useEffect(() => {
     const initSDK = async () => {
+      // SDKを動的に読み込む
+      const loadedSDK = await loadSDK();
+      
+      // SDKが利用できない場合はスキップ
+      if (!loadedSDK) {
+        setIsReady(true);
+        return;
+      }
+
+      setSdk(loadedSDK);
+
       try {
         // Farcaster SDKの初期化
-        const ctx = await sdk.context;
+        const ctx = await loadedSDK.context;
         
         if (ctx) {
           setContext({
@@ -44,7 +89,7 @@ export function useFarcasterSDK() {
         }
 
         // SDKの準備完了を通知
-        await sdk.actions.ready();
+        await loadedSDK.actions.ready();
         setIsReady(true);
       } catch (err) {
         console.error('Failed to initialize Farcaster SDK:', err);
@@ -58,6 +103,12 @@ export function useFarcasterSDK() {
   }, []);
 
   const openUrl = useCallback(async (url: string) => {
+    if (!sdk) {
+      // SDKが利用できない場合は新しいタブで開く
+      window.open(url, '_blank');
+      return;
+    }
+
     try {
       await sdk.actions.openUrl(url);
     } catch (err) {
@@ -67,6 +118,10 @@ export function useFarcasterSDK() {
   }, []);
 
   const close = useCallback(async () => {
+    if (!sdk) {
+      return;
+    }
+
     try {
       await sdk.actions.close();
     } catch (err) {

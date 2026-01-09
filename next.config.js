@@ -20,6 +20,23 @@ const nextConfig = {
       },
     ];
   },
+  webpack: (config, { isServer }) => {
+    // @farcaster/frame-sdkが存在しない場合でもエラーを発生させない
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      '@farcaster/frame-sdk': false,
+    };
+    
+    // オプショナルなパッケージを外部として扱う
+    if (!isServer) {
+      config.externals = config.externals || [];
+      config.externals.push({
+        '@farcaster/frame-sdk': 'commonjs @farcaster/frame-sdk',
+      });
+    }
+    
+    return config;
+  },
 };
 
 module.exports = nextConfig;
